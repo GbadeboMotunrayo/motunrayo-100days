@@ -70,7 +70,7 @@ def view_inventory(items):
         for item in items:
             cost = float(item["cost_cny"])
             sell = float(item["sell_ngn"])
-            margin = ((sell - cost) / sell) * 100
+            margin = ((sell - cost) / sell) * 100 if sell > 0 else 0.0
             print(f"{item['name']:<30}{item['quantity']:<8}{item['cost_cny']:<12}{item['sell_ngn']:<12}{margin:.1f}%")
         total_units = sum(int(i["quantity"]) for i in items)
         total_cost = sum(float(i["cost_cny"]) * int(i["quantity"]) for i in items)

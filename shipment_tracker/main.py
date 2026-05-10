@@ -17,8 +17,8 @@ def search_menu():
         with open("shipments.csv", "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                if term in row["tracking_number"].lower() or term in row["description"].lower():
-                    print(f"  {row['tracking_number']} | {row['method']} | {row['status']} | {row['date']}")
+                if term in row["tracking"].lower() or term in row["description"].lower():
+                    print(f"  {row['tracking']} | {row['method']} | {row['status']} | {row['date']}")
                     found = True
         if not found:
             print("  No shipments found.")
@@ -31,8 +31,8 @@ def search_menu():
         with open("inventory.csv", "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                if term in row["product"].lower():
-                    print(f"  {row['product']} | Qty: {row['quantity']} | Cost: ¥{row['cost_cny']} | Sell: ₦{row['sell_ngn']}")
+                if term in row["name"].lower():
+                    print(f"  {row['name']} | Qty: {row['quantity']} | Cost: ¥{row['cost_cny']} | Sell: ₦{row['sell_ngn']}")
                     found = True
         if not found:
             print("  No inventory items found.")
@@ -63,7 +63,7 @@ def export_report():
         with open("inventory.csv", "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                lines.append(f"  {row['product']} | Qty: {row['quantity']} | Sell: ₦{row['sell_ngn']}")
+                lines.append(f"  {row['name']} | Qty: {row['quantity']} | Sell: ₦{row['sell_ngn']}")
                 total_units += int(row["quantity"])
         lines.append(f"  TOTAL UNITS: {total_units}")
     except FileNotFoundError:
