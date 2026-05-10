@@ -1,8 +1,93 @@
+import csv
+import datetime
 from shipment_tracker import add_shipment, view_shipments, update_status, load_shipments
 from inventory import add_item, view_inventory, load_inventory
 from sales import log_sale, view_sales, load_sales
 from suppliers import add_supplier, view_suppliers, load_suppliers
 from dashboard import show_dashboard
+
+
+def search_menu():
+    print("\n=== SEARCH ===")
+    term = input("Enter tracking number or product name: ").strip().lower()
+
+    print("\n--- Shipment Results ---")
+    found = False
+    try:
+        with open("shipments.csv", "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if term in row["tracking_number"].lower() or term in row["description"].lower():
+                    print(f"  {row['tracking_number']} | {row['method']} | {row['status']} | {row['date']}")
+                    found = True
+        if not found:
+            print("  No shipments found.")
+    except FileNotFoundError:
+        print("  No shipment data yet.")
+
+    print("\n--- Inventory Results ---")
+    found = False
+    try:
+        with open("inventory.csv", "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if term in row["product"].lower():
+                    print(f"  {row['product']} | Qty: {row['quantity']} | Cost: ¥{row['cost_cny']} | Sell: ₦{row['sell_ngn']}")
+                    found = True
+        if not found:
+            print("  No inventory items found.")
+    except FileNotFoundError:
+        print("  No inventory data yet.")
+
+
+def export_report():
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    filename = f"report_{today}.txt"
+    lines = []
+    lines.append("=" * 40)
+    lines.append(f"BUSINESS REPORT — {today}")
+    lines.append("=" * 40)
+
+    lines.append("\n--- SHIPMENTS ---")
+    try:
+        with open("shipments.csv", "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                lines.append(f"  {row['tracking_number']} | {row['method']} | {row['status']} | {row['date']}")
+    except FileNotFoundError:
+        lines.append("  No shipment data.")
+
+    lines.append("\n--- INVENTORY ---")
+    total_units = 0
+    try:
+        with open("inventory.csv", "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                lines.append(f"  {row['product']} | Qty: {row['quantity']} | Sell: ₦{row['sell_ngn']}")
+                total_units += int(row["quantity"])
+        lines.append(f"  TOTAL UNITS: {total_units}")
+    except FileNotFoundError:
+        lines.append("  No inventory data.")
+
+    lines.append("\n--- SALES ---")
+    total_revenue = 0.0
+    try:
+        with open("sales.csv", "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                lines.append(f"  {row['date']} | {row['product']} | Qty: {row['quantity']} | ₦{row['amount']}")
+                total_revenue += float(row["amount"])
+        lines.append(f"  TOTAL REVENUE: ₦{total_revenue:,.2f}")
+    except FileNotFoundError:
+        lines.append("  No sales data.")
+
+    lines.append("\n" + "=" * 40)
+
+    with open(filename, "w") as f:
+        f.write("\n".join(lines))
+
+    print(f"\nReport saved as: {filename}")
+
 
 def shipments_menu():
     shipments = load_shipments()
@@ -24,6 +109,7 @@ def shipments_menu():
         else:
             print("Invalid choice. Please enter 1, 2, 3 or 4.")
 
+
 def inventory_menu():
     items = load_inventory()
     while True:
@@ -40,6 +126,7 @@ def inventory_menu():
             break
         else:
             print("Invalid choice. Please enter 1, 2 or 3.")
+
 
 def sales_menu():
     sales = load_sales()
@@ -58,6 +145,7 @@ def sales_menu():
         else:
             print("Invalid choice. Please enter 1, 2 or 3.")
 
+
 def suppliers_menu():
     suppliers = load_suppliers()
     while True:
@@ -75,6 +163,7 @@ def suppliers_menu():
         else:
             print("Invalid choice. Please enter 1, 2 or 3.")
 
+
 def main():
     while True:
         print("\n==== MOTUNRAYO BUSINESS TRACKER ====")
@@ -83,7 +172,9 @@ def main():
         print("3. Inventory")
         print("4. Sales")
         print("5. Suppliers")
-        print("6. Quit")
+        print("6. Search")
+        print("7. Export daily report")
+        print("8. Quit")
         choice = input("Choose: ").strip()
         if choice == "1":
             show_dashboard()
@@ -96,9 +187,14 @@ def main():
         elif choice == "5":
             suppliers_menu()
         elif choice == "6":
+            search_menu()
+        elif choice == "7":
+            export_report()
+        elif choice == "8":
             print("Goodbye!")
             break
         else:
-            print("Invalid choice. Please enter a number between 1 and 6.")
+            print("Invalid choice. Please enter a number between 1 and 8.")
+
 
 main()
