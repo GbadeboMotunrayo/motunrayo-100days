@@ -1,43 +1,46 @@
 import csv
 import datetime
+from colorama import init, Fore, Style
 from shipment_tracker import add_shipment, view_shipments, update_status, load_shipments
 from inventory import add_item, view_inventory, load_inventory
 from sales import log_sale, view_sales, load_sales
 from suppliers import add_supplier, view_suppliers, load_suppliers
 from dashboard import show_dashboard
 
+init(autoreset=True)
+
 
 def search_menu():
-    print("\n=== SEARCH ===")
+    print(Fore.YELLOW + "\n=== SEARCH ===")
     term = input("Enter tracking number or product name: ").strip().lower()
 
-    print("\n--- Shipment Results ---")
+    print(Fore.CYAN + "\n--- Shipment Results ---")
     found = False
     try:
         with open("shipments.csv", "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 if term in row["tracking"].lower() or term in row["description"].lower():
-                    print(f"  {row['tracking']} | {row['method']} | {row['status']} | {row['date']}")
+                    print(f"  {Fore.WHITE}{row['tracking']} | {row['method']} | {Fore.GREEN}{row['status']}{Fore.WHITE} | {row['date']}")
                     found = True
         if not found:
-            print("  No shipments found.")
+            print(Fore.RED + "  No shipments found.")
     except FileNotFoundError:
-        print("  No shipment data yet.")
+        print(Fore.RED + "  No shipment data yet.")
 
-    print("\n--- Inventory Results ---")
+    print(Fore.CYAN + "\n--- Inventory Results ---")
     found = False
     try:
         with open("inventory.csv", "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 if term in row["name"].lower():
-                    print(f"  {row['name']} | Qty: {row['quantity']} | Cost: ¥{row['cost_cny']} | Sell: ₦{row['sell_ngn']}")
+                    print(f"  {Fore.WHITE}{row['name']} | Qty: {Fore.YELLOW}{row['quantity']}{Fore.WHITE} | Cost: ¥{row['cost_cny']} | Sell: ₦{row['sell_ngn']}")
                     found = True
         if not found:
-            print("  No inventory items found.")
+            print(Fore.RED + "  No inventory items found.")
     except FileNotFoundError:
-        print("  No inventory data yet.")
+        print(Fore.RED + "  No inventory data yet.")
 
 
 def export_report():
@@ -53,7 +56,7 @@ def export_report():
         with open("shipments.csv", "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                lines.append(f"  {row['tracking_number']} | {row['method']} | {row['status']} | {row['date']}")
+                lines.append(f"  {row['tracking']} | {row['method']} | {row['status']} | {row['date']}")
     except FileNotFoundError:
         lines.append("  No shipment data.")
 
@@ -86,14 +89,14 @@ def export_report():
     with open(filename, "w") as f:
         f.write("\n".join(lines))
 
-    print(f"\nReport saved as: {filename}")
+    print(Fore.GREEN + f"\nReport saved as: {filename}")
 
 
 def shipments_menu():
     shipments = load_shipments()
     while True:
-        print("\n-- SHIPMENTS --")
-        print("1. View shipments")
+        print(Fore.YELLOW + "\n-- SHIPMENTS --")
+        print(Fore.WHITE + "1. View shipments")
         print("2. Add shipment")
         print("3. Update status")
         print("4. Back to main menu")
@@ -107,14 +110,14 @@ def shipments_menu():
         elif c == "4":
             break
         else:
-            print("Invalid choice. Please enter 1, 2, 3 or 4.")
+            print(Fore.RED + "Invalid choice. Please enter 1, 2, 3 or 4.")
 
 
 def inventory_menu():
     items = load_inventory()
     while True:
-        print("\n-- INVENTORY --")
-        print("1. View inventory")
+        print(Fore.YELLOW + "\n-- INVENTORY --")
+        print(Fore.WHITE + "1. View inventory")
         print("2. Add product")
         print("3. Back to main menu")
         c = input("Choose: ").strip()
@@ -125,14 +128,14 @@ def inventory_menu():
         elif c == "3":
             break
         else:
-            print("Invalid choice. Please enter 1, 2 or 3.")
+            print(Fore.RED + "Invalid choice. Please enter 1, 2 or 3.")
 
 
 def sales_menu():
     sales = load_sales()
     while True:
-        print("\n-- SALES --")
-        print("1. View sales")
+        print(Fore.YELLOW + "\n-- SALES --")
+        print(Fore.WHITE + "1. View sales")
         print("2. Log a sale")
         print("3. Back to main menu")
         c = input("Choose: ").strip()
@@ -143,14 +146,14 @@ def sales_menu():
         elif c == "3":
             break
         else:
-            print("Invalid choice. Please enter 1, 2 or 3.")
+            print(Fore.RED + "Invalid choice. Please enter 1, 2 or 3.")
 
 
 def suppliers_menu():
     suppliers = load_suppliers()
     while True:
-        print("\n-- SUPPLIERS --")
-        print("1. View suppliers")
+        print(Fore.YELLOW + "\n-- SUPPLIERS --")
+        print(Fore.WHITE + "1. View suppliers")
         print("2. Add supplier")
         print("3. Back to main menu")
         c = input("Choose: ").strip()
@@ -161,21 +164,21 @@ def suppliers_menu():
         elif c == "3":
             break
         else:
-            print("Invalid choice. Please enter 1, 2 or 3.")
+            print(Fore.RED + "Invalid choice. Please enter 1, 2 or 3.")
 
 
 def main():
     while True:
-        print("\n==== MOTUNRAYO BUSINESS TRACKER ====")
-        print("1. Dashboard")
+        print(Fore.YELLOW + "\n==== MOTUNRAYO BUSINESS TRACKER ====")
+        print(Fore.WHITE + "1. Dashboard")
         print("2. Shipments")
         print("3. Inventory")
         print("4. Sales")
         print("5. Suppliers")
         print("6. Search")
         print("7. Export daily report")
-        print("8. Quit")
-        choice = input("Choose: ").strip()
+        print(Fore.RED + "8. Quit")
+        choice = input(Fore.WHITE + "Choose: ").strip()
         if choice == "1":
             show_dashboard()
         elif choice == "2":
@@ -191,10 +194,10 @@ def main():
         elif choice == "7":
             export_report()
         elif choice == "8":
-            print("Goodbye!")
+            print(Fore.GREEN + "Goodbye!")
             break
         else:
-            print("Invalid choice. Please enter a number between 1 and 8.")
+            print(Fore.RED + "Invalid choice. Please enter a number between 1 and 8.")
 
 
 main()
