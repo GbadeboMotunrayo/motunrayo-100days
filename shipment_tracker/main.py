@@ -78,8 +78,8 @@ def export_report():
         with open("sales.csv", "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                lines.append(f"  {row['date']} | {row['product']} | Qty: {row['quantity']} | ₦{row['amount']}")
-                total_revenue += float(row["amount"])
+                lines.append(f"  {row['date']} | {row['product']} | Qty: {row['quantity']} | ₦{row['amount_ngn']}")
+                total_revenue += float(row["amount_ngn"])
         lines.append(f"  TOTAL REVENUE: ₦{total_revenue:,.2f}")
     except FileNotFoundError:
         lines.append("  No sales data.")
