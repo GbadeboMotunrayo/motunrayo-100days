@@ -6,6 +6,7 @@ from inventory import add_item, view_inventory, load_inventory
 from sales import log_sale, view_sales, load_sales
 from suppliers import add_supplier, view_suppliers, load_suppliers
 from dashboard import show_dashboard
+from returns import log_return, view_returns, load_returns
 
 init(autoreset=True)
 
@@ -83,6 +84,15 @@ def export_report():
         lines.append(f"  TOTAL REVENUE: ₦{total_revenue:,.2f}")
     except FileNotFoundError:
         lines.append("  No sales data.")
+
+    lines.append("\n--- RETURNS ---")
+    try:
+        with open("returns.csv", "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                lines.append(f"  {row['date']} | {row['tracking']} | {row['reason']} | {row['action']}")
+    except FileNotFoundError:
+        lines.append("  No returns logged.")
 
     lines.append("\n" + "=" * 40)
 
@@ -167,6 +177,24 @@ def suppliers_menu():
             print(Fore.RED + "Invalid choice. Please enter 1, 2 or 3.")
 
 
+def returns_menu():
+    returns = load_returns()
+    while True:
+        print(Fore.YELLOW + "\n-- RETURNS --")
+        print(Fore.WHITE + "1. View returns")
+        print("2. Log a return")
+        print("3. Back to main menu")
+        c = input("Choose: ").strip()
+        if c == "1":
+            view_returns(returns)
+        elif c == "2":
+            log_return(returns)
+        elif c == "3":
+            break
+        else:
+            print(Fore.RED + "Invalid choice. Please enter 1, 2 or 3.")
+
+
 def main():
     while True:
         print(Fore.YELLOW + "\n==== MOTUNRAYO BUSINESS TRACKER ====")
@@ -175,9 +203,10 @@ def main():
         print("3. Inventory")
         print("4. Sales")
         print("5. Suppliers")
-        print("6. Search")
-        print("7. Export daily report")
-        print(Fore.RED + "8. Quit")
+        print("6. Returns")
+        print("7. Search")
+        print("8. Export daily report")
+        print(Fore.RED + "9. Quit")
         choice = input(Fore.WHITE + "Choose: ").strip()
         if choice == "1":
             show_dashboard()
@@ -190,14 +219,16 @@ def main():
         elif choice == "5":
             suppliers_menu()
         elif choice == "6":
-            search_menu()
+            returns_menu()
         elif choice == "7":
-            export_report()
+            search_menu()
         elif choice == "8":
+            export_report()
+        elif choice == "9":
             print(Fore.GREEN + "Goodbye!")
             break
         else:
-            print(Fore.RED + "Invalid choice. Please enter a number between 1 and 8.")
+            print(Fore.RED + "Invalid choice. Please enter a number between 1 and 9.")
 
 
 main()
